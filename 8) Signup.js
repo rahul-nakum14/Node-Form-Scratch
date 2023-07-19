@@ -1,4 +1,6 @@
 const express = require('express')
+const mongoose = require('mongoose');
+
 
 const app = express();
 
@@ -25,7 +27,7 @@ userRouter
 
 authRouter
 .route('/signup')
-.get(Middlewarefunc,getsignup,Middlewarefunc2)
+.get(getsignup)
 .post(postsignup)
 
 //Middleware Functions
@@ -85,7 +87,7 @@ function getUsersbyid(req, res) {
 };
 
 function getsignup(req,res,next){
-    console.log('getsignup called');
+
     res.sendFile('./views/signup.html',{root:__dirname});
     next();
 }
@@ -96,3 +98,52 @@ function postsignup(req,res){
     res.json({message:'User Signup',data:obj});
 
 }
+
+
+//MongoDb Started
+
+const db_link = 'mongodb+srv://hanonymous371:A6s35aWYckJi7BbH@cluster0.qdzm9g4.mongodb.net/'
+
+mongoose.connect(db_link)
+.then(function db() {
+    console.log('DB connected');
+})
+.catch(function (err) {
+    console.log(err);
+})
+
+
+const userSchema = mongoose.Schema({
+    name:{
+        type:String,
+        required: true
+    },
+    email:{
+        type:String,
+        required: true,
+        unique:true
+    },
+    password:{
+        type:String,
+        required: true,
+        minLength: 8
+    },
+    confirmpassword:{
+        type:String,
+        required: true,
+        minLength: 8
+    }
+})
+
+const UserModel = mongoose.model('UserModel',userSchema);
+
+(async function createUser(){
+    let user={
+        name:'test',
+        email:'1234d@gmail.com',
+        password:'123456789',
+        confirmpassword:'123456789'
+    }
+    let data = await UserModel.create(user);
+    console.log(data);
+})();
